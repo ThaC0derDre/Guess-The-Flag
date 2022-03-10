@@ -13,6 +13,8 @@ struct ContentView: View {
     @State private var scoreTitle       = ""
     @State private var scoreLabel       = 0
     @State private var correctAnswer    = Int.random(in: 0...2)
+    @State private var incorrectGuess   = ""
+    @State private var correctUser      = false
     @State private var countries = ["Estonia","France","Germany","Ireland","Italy","Monaco","Nigeria","Poland","Russia", "Spain","UK","US"].shuffled()
     
     
@@ -22,6 +24,20 @@ struct ContentView: View {
                 .ignoresSafeArea()
             
             VStack (spacing: 40) {
+                HStack{
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    
+                Text("Score: \(scoreLabel)")
+                        .foregroundColor(.white)
+                    Spacer()
+                }
                 Spacer()
                 VStack {
                     Text("Tap the flag of")
@@ -35,6 +51,10 @@ struct ContentView: View {
                 ForEach(0..<3) { number in
                     Button {
                         checkAnswer(number)
+                        if scoreTitle != "Correct" {
+                            correctUser = true
+                            incorrectGuess = countries[number]
+                        }
                     } label: {
                         Image(countries[number])
                             .renderingMode(.original)
@@ -49,20 +69,24 @@ struct ContentView: View {
         .alert(scoreTitle, isPresented: $showScore) {
             Button("OK") {
                 shuffleCountries()
+                correctUser = false
             }
         }message: {
+            if correctUser {
+                Text("You selected the flag for \(incorrectGuess)!")
+            }
             Text("Score is \(scoreLabel)")
         }
     }
     
     
     func checkAnswer(_ number: Int) {
-        scoreTitle = correctAnswer == number ? "correct" : "Wrong"
         if correctAnswer  == number {
             scoreTitle = "Correct"
             scoreLabel += 1
         }else {
             scoreTitle = "Wrong"
+            incorrectGuess = countries[number]
         }
         showScore = true
     }
